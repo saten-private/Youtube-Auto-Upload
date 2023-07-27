@@ -4,6 +4,7 @@ import argparse
 import os
 import random
 import time
+import openai
 
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
@@ -90,23 +91,64 @@ def resumable_upload(request):
       time.sleep(sleep_seconds)
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
-  parser.add_argument('--file', required=True, help='Video file to upload')
-  parser.add_argument('--title', help='Video title', default='Test Title')
-  parser.add_argument('--description', help='Video description',
-    default='Test Description')
-  parser.add_argument('--category', default='22',
-    help='Numeric video category. ' +
-      'See https://developers.google.com/youtube/v3/docs/videoCategories/list')
-  parser.add_argument('--keywords', help='Video keywords, comma separated',
-    default='')
-  parser.add_argument('--privacyStatus', choices=VALID_PRIVACY_STATUSES,
-    default='private', help='Video privacy status.')
-  args = parser.parse_args()
 
-  youtube = get_authenticated_service()
+  with open("/Users/aiwork/Downloads/temp.txt") as f:
+    s = f.read()
 
-  try:
-    initialize_upload(youtube, args)
-  except HttpError as e:
-    print('An HTTP error {} occurred:\n{}'.format(e.resp.status, e.content))
+    print("temp.txt:")
+    print(s)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--password', required=True, help='key')
+    parser.add_argument('--file', required=True, help='Video file to upload')
+    parser.add_argument('--title', help='Video title', default='Test Title')
+    parser.add_argument('--description', help='Video description',
+      default='Test Description')
+    parser.add_argument('--category', default='22',
+      help='Numeric video category. ' +
+        'See https://developers.google.com/youtube/v3/docs/videoCategories/list')
+    parser.add_argument('--keywords', help='Video keywords, comma separated',
+      default='')
+    parser.add_argument('--privacyStatus', choices=VALID_PRIVACY_STATUSES,
+      default='private', help='Video privacy status.')
+    args = parser.parse_args()
+
+    youtube = get_authenticated_service()
+
+    openai.api_key = args.password
+    prompt = f"""You are the best music producer.
+Please create the best title in Youtube for the following music.
+
+# Music Description
+{s}"""
+    messages = [{"role": "system", "content": prompt}]
+    response = openai.ChatCompletion.create(model="gpt-3.5-turbo",
+                                          messages=messages,
+                                          max_tokens=50,
+                                          temperature=0.0)
+    title = response.choices[0].message.content.strip()
+    args.title = title
+    print("title:")
+    print(title)
+
+    openai.api_key = args.password
+    prompt = f"""You are the best music producer.
+Please create the best description in Youtube of the music below.
+
+# Music Description
+{s}"""
+    messages = [{"role": "system", "content": prompt}]
+    response = openai.ChatCompletion.create(model="gpt-3.5-turbo",
+                                          messages=messages,
+                                          max_tokens=50,
+                                          temperature=0.0)
+    description = response.choices[0].message.content.strip()
+    args.description = description
+
+    print("description:")
+    print(description)
+
+    try:
+      initialize_upload(youtube, args)
+    except HttpError as e:
+      print('An HTTP error {} occurred:\n{}'.format(e.resp.status, e.content))

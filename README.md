@@ -13,9 +13,9 @@
  6. copy and save your Client ID and Client Secret
  7. go to colab and run
  ```
-!pip install --upgrade google-api-python-client
-!pip install --upgrade google-auth-oauthlib google-auth-httplib2
 !git clone https://github.com/zcrossoverz/Youtube-Auto-Upload
+%cd Youtube-Auto-Upload
+!pip install -r requirements.txt
 ```
 8. config your client_secret.josn
 
@@ -37,7 +37,7 @@ with open("video.mp4", "wb") as file:
 2. Example upload file on colab to youtube
 
 ```
-!cd Youtube-Auto-Upload && python2.7 youtube.py --file="../video.mp4" --title="Test api upload" --description="Nhan dep trai" --keywords="crossover" --privacyStatus="private"
+!python youtube.py --file="../video.mp4" --title="Test api upload" --description="Nhan dep trai" --keywords="crossover" --privacyStatus="private"
 ```
 
 
