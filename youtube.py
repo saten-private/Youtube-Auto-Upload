@@ -140,7 +140,7 @@ Please create the best description in Youtube of the music below.
     messages = [{"role": "system", "content": prompt}]
     response = openai.ChatCompletion.create(model="gpt-3.5-turbo",
                                           messages=messages,
-                                          max_tokens=50,
+                                          max_tokens=100,
                                           temperature=0.0)
     description = response.choices[0].message.content.strip()
     args.description = description
